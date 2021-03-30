@@ -6,8 +6,8 @@ sim = Simulation(width=650, height=600, title="Simulation", gridres=(50, 50),
 # Random particle-positions
 for i in range(50):
     s = 4
-    Particle(sim, random.normalvariate(sim.gui.width / 2, sim.gui.width / 5),
-             random.normalvariate(sim.gui.height / 2, sim.gui.height / 5), radius=s,
+    Particle(sim, random.normalvariate(sim.width / 2, sim.width / 5),
+             random.normalvariate(sim.height / 2, sim.height / 5), radius=s,
              color=np.random.randint(0, 255, 3).tolist(),
              mass=1, bounciness=0.7, velocity=np.zeros(2), collisions=False,
              attract_r=-1, repel_r=10, attraction_strength=0.25, repulsion_strength=1)

@@ -136,7 +136,7 @@ class Particle:
                 else:
                     percentage = 1 if max_force == 0 else 0
 
-                self.sim.link_colors.append([self, part, percentage])
+                self.sim.link_colors.append([self, part, min(percentage, 1)])
 
             if 0 <= max_force <= abs(magnitude):
                 self.sim.unlink([self, part])
@@ -164,6 +164,7 @@ class Particle:
                         p in self.collisions:
                     continue
 
+                # Attract / repel
                 repel_r = None
                 if is_linked and self.link_lengths[p] != 'repel':
                     repel_r = self.link_lengths[p]
@@ -172,8 +173,6 @@ class Particle:
                 distance = np.linalg.norm(direction)
                 if distance != 0:
                     direction = direction / distance
-
-                # Attract / repel
                 conditions = [
                     (p.attr != 0 or p.repel != 0) and (p.attr_r < 0 or p.attr_r < 0 or distance < p.attr_r),
                     (self.attr != 0 or self.repel != 0) and
@@ -252,22 +251,27 @@ class Particle:
                 self.v = np.array([self.sim.mx - self.sim.prev_mx, self.sim.my - self.sim.prev_my], dtype='float64') / \
                          self.sim.speed
 
-        if self.sim.right and self.x + self.r >= self.sim.gui.width:
+        if self.sim.right and self.x + self.r >= self.sim.width:
             self.v[0] *= -self.bounciness
             self.v[1] *= 1 - self.sim.ground_friction
-            self.x = self.sim.gui.width - self.r
+            self.x = self.sim.width - self.r
         if self.sim.left and self.x - self.r <= 0:
             self.v[0] *= -self.bounciness
             self.v[1] *= 1 - self.sim.ground_friction
             self.x = self.r
-        if self.sim.bottom and self.y + self.r >= self.sim.gui.height:
+        if self.sim.bottom and self.y + self.r >= self.sim.height:
             self.v[1] *= -self.bounciness
             self.v[0] *= 1 - self.sim.ground_friction
-            self.y = self.sim.gui.height - self.r
+            self.y = self.sim.height - self.r
         if self.sim.top and self.y - self.r <= 0:
             self.v[1] *= -self.bounciness
             self.v[0] *= 1 - self.sim.ground_friction
             self.y = self.r
+
+        if self.sim.void_edges and (self.x - self.r >= self.sim.width or self.x + self.r <= 0 or
+                self.y - self.r >= self.sim.height or self.y + self.r <= 0):
+            self.delete()
+            return
 
         self.collisions = []
         self.forces = []

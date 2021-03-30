@@ -30,11 +30,13 @@ class SaveManager:
                                 'grid_res_x_value': [self.sim.gui.grid_res_x_value.get(), 'set'],
                                 'grid_res_y_value': [self.sim.gui.grid_res_y_value.get(), 'set'],
                                 'delay_entry': [self.sim.gui.delay_entry.get(), 'entry'],
-                                'calculate_radii_diff_check': [self.sim.gui.calculate_radii_diff_check.get(), 'set'],
+                                'calculate_radii_diff_bool': [self.sim.gui.calculate_radii_diff_bool.get(), 'set'],
                                 'g_dir': [self.sim.g_dir, 'var'],
                                 'wind_force': [self.sim.wind_force, 'var'],
                                 'stress_visualization': [self.sim.stress_visualization, 'var'],
-                                'bg_color': [self.sim.bg_color, 'var']
+                                'bg_color': [self.sim.bg_color, 'var'],
+                                'void_edges': [self.sim.void_edges, 'var'],
+                                'code': [self.sim.code, 'var']
                                 }
 
                 particle_settings = {'radius_entry': [self.sim.gui.radius_entry.get(), 'entry'],
@@ -43,18 +45,18 @@ class SaveManager:
                                      'velocity_x_entry': [self.sim.gui.velocity_x_entry.get(), 'entry'],
                                      'velocity_y_entry': [self.sim.gui.velocity_y_entry.get(), 'entry'],
                                      'bounciness_entry': [self.sim.gui.bounciness_entry.get(), 'entry'],
-                                     'do_collision_check': [self.sim.gui.do_collision_check.get(), 'set'],
-                                     'locked_check': [self.sim.gui.locked_check.get(), 'set'],
-                                     'linked_group_check': [self.sim.gui.linked_group_check.get(), 'set'],
+                                     'do_collision_bool': [self.sim.gui.do_collision_bool.get(), 'set'],
+                                     'locked_bool': [self.sim.gui.locked_bool.get(), 'set'],
+                                     'linked_group_bool': [self.sim.gui.linked_group_bool.get(), 'set'],
                                      'attr_r_entry': [self.sim.gui.attr_r_entry.get(), 'entry'],
                                      'repel_r_entry': [self.sim.gui.repel_r_entry.get(), 'entry'],
                                      'attr_strength_entry': [self.sim.gui.attr_strength_entry.get(), 'entry'],
-                                     'gravity_mode_check': [self.sim.gui.gravity_mode_check.get(), 'set'],
+                                     'gravity_mode_bool': [self.sim.gui.gravity_mode_bool.get(), 'set'],
                                      'repel_strength_entry': [self.sim.gui.repel_strength_entry.get(), 'entry'],
                                      'link_attr_break_entry': [self.sim.gui.link_attr_break_entry.get(), 'entry'],
                                      'link_repel_break_entry': [self.sim.gui.link_repel_break_entry.get(), 'entry'],
                                      'groups_entry': [self.sim.gui.groups_entry.get(), 'entry'],
-                                     'separate_group_check': [self.sim.gui.separate_group_check.get(), 'set']
+                                     'separate_group_bool': [self.sim.gui.separate_group_bool.get(), 'set']
                                      }
 
                 data = {'particles': [particle.return_dict() for particle in self.sim.particles],

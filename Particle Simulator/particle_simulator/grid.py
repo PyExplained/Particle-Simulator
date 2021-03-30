@@ -7,8 +7,8 @@ class Grid:
         self.grid = None
         self.rows = rows
         self.columns = columns
-        self.row_height = sim.gui.height / self.rows
-        self.column_width = sim.gui.width / self.columns
+        self.row_height = sim.height / self.rows
+        self.column_width = sim.width / self.columns
 
     def init_grid(self):
         self.grid = np.empty((self.rows, self.columns), dtype=np.object)

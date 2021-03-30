@@ -4,6 +4,9 @@ from particle_simulator import *
 class Simulation:
     def __init__(self, width=650, height=600, title="Simulation", gridres=(50, 50),
                  temperature=0, g=0.1, air_res=0.05, ground_friction=0, fps_update_delay=0.5):
+        self.width = width
+        self.height = height
+        
         self.temperature = temperature
         self.g = g  # gravity
         self.g_dir = np.array([0, 1])
@@ -41,12 +44,15 @@ class Simulation:
         self.bottom = True
         self.left = True
         self.right = True
+        self.void_edges = False
 
         self.bg_color = [[255, 255, 255], "#ffffff"]
         self.stress_visualization = False
         self.link_colors = []
 
-        self.gui = GUI(self, title, width, height, gridres)
+        self.code = 'print("Hello World")'
+
+        self.gui = GUI(self, title, gridres)
         self.grid = Grid(self, *gridres)
         self.save_manager = SaveManager(self)
 
@@ -255,12 +261,12 @@ class Simulation:
 
             kwargs['radius'] = radius
             kwargs['color'] = color
-            kwargs['collisions'] = self.gui.do_collision_check.get()
-            kwargs['locked'] = self.gui.locked_check.get()
-            kwargs['linked_group_particles'] = self.gui.linked_group_check.get()
+            kwargs['collisions'] = self.gui.do_collision_bool.get()
+            kwargs['locked'] = self.gui.locked_bool.get()
+            kwargs['linked_group_particles'] = self.gui.linked_group_bool.get()
             kwargs['group'] = self.gui.groups_entry.get()
-            kwargs['separate_group'] = self.gui.separate_group_check.get()
-            kwargs['gravity_mode'] = self.gui.gravity_mode_check.get()
+            kwargs['separate_group'] = self.gui.separate_group_bool.get()
+            kwargs['gravity_mode'] = self.gui.gravity_mode_bool.get()
 
             return kwargs
         except Exception as error:
@@ -298,9 +304,9 @@ class Simulation:
                           'velocity_x_entry': ['v[0]', 'entry'],
                           'velocity_y_entry': ['v[1]', 'entry'],
                           'bounciness_entry': ['bounciness', 'entry'],
-                          'do_collision_check': ['collision_bool', 'set'],
-                          'locked_check': ['locked', 'set'],
-                          'linked_group_check': ['linked_group_particles', 'set'],
+                          'do_collision_bool': ['collision_bool', 'set'],
+                          'locked_bool': ['locked', 'set'],
+                          'linked_group_bool': ['linked_group_particles', 'set'],
                           'attr_r_entry': ['attr_r', 'entry'],
                           'repel_r_entry': ['repel_r', 'entry'],
                           'attr_strength_entry': ['attr', 'entry'],
@@ -308,8 +314,8 @@ class Simulation:
                           'link_attr_break_entry': ['link_attr_breaking_force', 'entry'],
                           'link_repel_break_entry': ['link_repel_breaking_force', 'entry'],
                           'groups_entry': ['group', 'entry'],
-                          'separate_group_check': ['separate_group', 'set'],
-                          'gravity_mode_check': ['gravity_mode', 'set']
+                          'separate_group_bool': ['separate_group', 'set'],
+                          'gravity_mode_bool': ['gravity_mode', 'set']
                           }
         particle_settings = variable_names.copy()
 
@@ -417,7 +423,7 @@ class Simulation:
     def update_vars(self):
         for var, entry in [('g', 'gravity_entry'), ('air_res', 'air_res_entry'), ('ground_friction', 'friction_entry'),
                            ('use_grid', 'grid_bool'), ('min_spawn_delay', 'delay_entry'),
-                           ('calculate_radii_diff', 'calculate_radii_diff_check')]:
+                           ('calculate_radii_diff', 'calculate_radii_diff_bool')]:
             try:
                 vars(self)[var] = float(eval(vars(self.gui)[entry].get()))
             except:
@@ -431,12 +437,12 @@ class Simulation:
         self.left = self.gui.left_bool.get()
         self.right = self.gui.right_bool.get()
         self.use_grid = self.gui.grid_bool.get()
-        self.calculate_radii_diff = self.gui.calculate_radii_diff_check.get()
+        self.calculate_radii_diff = self.gui.calculate_radii_diff_bool.get()
 
     def simulate(self):
         while self.running:
             self.gui.canvas.delete("all")
-            image = np.full((self.gui.height, self.gui.width, 3), self.bg_color[0])
+            image = np.full((self.height, self.width, 3), self.bg_color[0])
             self.link_colors = []
 
             self.update_vars()
@@ -481,7 +487,7 @@ class Simulation:
             if self.gui.show_links.get():
                 if self.stress_visualization and not self.paused:
                     for p1, p2, percentage in self.link_colors:
-                        color = [max(235 * percentage, 235)] + [235 * (1 - percentage)] * 2
+                        color = [max(255 * percentage, 235)] + [235 * (1 - percentage)] * 2
                         cv2.line(image, (int(p1.x), int(p1.y)), (int(p2.x), int(p2.y)), color, 1)
                 else:
                     for p1 in self.particles:
@@ -518,8 +524,3 @@ class Simulation:
             self.my = self.gui.tk.winfo_pointery() - self.gui.tk.winfo_rooty() - 30
 
             self.gui.update()
-
-    def destroy(self):
-        if messagebox.askokcancel("Quit", "Are you sure you want to quit?"):
-            self.running = False
-            self.gui.tk.destroy()

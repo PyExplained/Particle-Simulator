@@ -2,24 +2,22 @@ from particle_simulator import *
 
 
 class GUI:
-    def __init__(self, sim, title, width, height, gridres):
+    def __init__(self, sim, title, gridres):
         self.sim = sim
-        self.width = width
-        self.height = height
 
         self.tk = Tk()
         self.tk.title(title)
         self.tk.resizable(0, 0)
-        self.tk.protocol("WM_DELETE_WINDOW", self.sim.destroy)
-        self.gui_canvas = Canvas(self.tk, width=self.width + 200, height=self.height + 30)
+        self.tk.protocol("WM_DELETE_WINDOW", self.destroy)
+        self.gui_canvas = Canvas(self.tk, width=self.sim.width + 200, height=self.sim.height + 30)
         self.gui_canvas.pack()
-        self.canvas = Canvas(self.tk, width=self.width, height=self.height)
+        self.canvas = Canvas(self.tk, width=self.sim.width, height=self.sim.height)
         self.canvas.place(x=0, y=30)
 
         self.code_window = None
         self.extra_window = None
 
-        self.toolbar = self.gui_canvas.create_rectangle(0, 0, self.width, 30, fill="#1f3333")
+        self.toolbar = self.gui_canvas.create_rectangle(0, 0, self.sim.width, 30, fill="#1f3333")
         self.gui_canvas.create_line(80, 0, 80, 30, fill='grey30')
 
         self.play_photo = PhotoImage(file='Assets/play.gif', master=self.tk).subsample(8, 8)
@@ -65,30 +63,30 @@ class GUI:
         self.save_btn = Button(self.tk, image=self.save_img, cursor='hand2',
                                bg='#1f3333', activebackground='#1f3333', relief='flat',
                                command=lambda: self.sim.save_manager.save())
-        self.save_btn.place(x=self.width - 110, y=16, anchor='center')
+        self.save_btn.place(x=self.sim.width - 110, y=16, anchor='center')
 
         self.load_img = PhotoImage(file='Assets/load.gif', master=self.tk).subsample(32, 32)
         self.load_btn = Button(self.tk, image=self.load_img, cursor='hand2',
                                bg='#1f3333', activebackground='#1f3333', relief='flat',
                                command=lambda: self.sim.save_manager.load())
-        self.load_btn.place(x=self.width - 75, y=16, anchor='center')
+        self.load_btn.place(x=self.sim.width - 75, y=16, anchor='center')
 
         self.code_img = PhotoImage(file='Assets/code.gif', master=self.tk).subsample(13, 13)
         self.code_btn = Button(self.tk, image=self.code_img, cursor='hand2', relief=FLAT,
                                bg='#1f3333', activebackground='#1f3333',
                                command=lambda: CodeWindow(self.sim))
-        self.code_btn.place(x=self.width - 25, y=16, anchor='center')
+        self.code_btn.place(x=self.sim.width - 25, y=16, anchor='center')
 
         # layout sidebar-GUI
         self.tabControl = ttk.Notebook(self.tk)
         self.tab1 = ttk.Frame(self.tabControl, relief='flat')
         self.tabControl.add(self.tab1, text='Sim-Settings')
-        self.tab2 = ttk.Frame(self.tabControl, relief='flat', width=200, height=self.height + 30)
+        self.tab2 = ttk.Frame(self.tabControl, relief='flat', width=200, height=self.sim.height + 30)
         self.tabControl.add(self.tab2, text='Particle-Settings')
-        self.tabControl.place(x=self.width, y=0)
+        self.tabControl.place(x=self.sim.width, y=0)
 
         # layout self.tab1
-        self.tab1_canvas = Canvas(self.tab1, width=200, height=self.height)
+        self.tab1_canvas = Canvas(self.tab1, width=200, height=self.sim.height)
         self.tab1_canvas.pack()
 
         Label(self.tab1, text='Gravity:', font=('helvetica', 8)).place(x=7, y=20, anchor='nw')
@@ -184,10 +182,10 @@ class GUI:
         self.delay_entry.insert(0, self.sim.min_spawn_delay)
         self.delay_entry.place(x=100, y=533)
 
-        self.calculate_radii_diff_check = BooleanVar(self.tk, False)
+        self.calculate_radii_diff_bool = BooleanVar(self.tk, False)
         self.calculate_radii_diff_chk = Checkbutton(self.tab1, text='Better Radii-Calculation',
                                                     font=('helvetica', 8),
-                                                    var=self.calculate_radii_diff_check)
+                                                    var=self.calculate_radii_diff_bool)
         self.calculate_radii_diff_chk.place(x=7, y=553, anchor='nw')
 
         self.extra_img = PhotoImage(file='Assets/dots.gif', master=self.tk).subsample(11, 11)
@@ -197,7 +195,7 @@ class GUI:
         self.extra_btn.place(x=7, y=580)
 
         # layout tab2
-        self.tab2_canvas = Canvas(self.tab2, width=200, height=self.height)
+        self.tab2_canvas = Canvas(self.tab2, width=200, height=self.sim.height)
         self.tab2_canvas.pack()
 
         Label(self.tab2, text='Radius:', font=('helvetica', 8)).place(x=7, y=20, anchor='nw')
@@ -240,14 +238,14 @@ class GUI:
         self.velocity_y_entry.insert(0, 0)
         self.velocity_y_entry.place(x=100, y=162)
 
-        self.locked_check = BooleanVar(self.tk, False)
+        self.locked_bool = BooleanVar(self.tk, False)
         self.locked_chk = Checkbutton(self.tab2, text='Locked', font=('helvetica', 8),
-                                      var=self.locked_check)
+                                      var=self.locked_bool)
         self.locked_chk.place(x=7, y=190, anchor='nw')
 
-        self.do_collision_check = BooleanVar(self.tk, False)
+        self.do_collision_bool = BooleanVar(self.tk, False)
         self.do_collision_chk = Checkbutton(self.tab2, text='Check Collisions', font=('helvetica', 8),
-                                            var=self.do_collision_check)
+                                            var=self.do_collision_bool)
         self.do_collision_chk.place(x=7, y=210, anchor='nw')
 
         Label(self.tab2, text='Attraction-radius:', font=('helvetica', 8)).place(x=7, y=250, anchor='nw')
@@ -262,9 +260,9 @@ class GUI:
         self.attr_strength_entry.insert(0, 0.5)
         self.attr_strength_entry.place(x=100, y=273)
 
-        self.gravity_mode_check = BooleanVar(self.tk, False)
+        self.gravity_mode_bool = BooleanVar(self.tk, False)
         self.gravity_mode_chk = Checkbutton(self.tab2, text='Gravity-Mode', font=('helvetica', 7),
-                                            var=self.gravity_mode_check)
+                                            var=self.gravity_mode_bool)
         self.gravity_mode_chk.place(x=7, y=290, anchor='nw')
 
         Label(self.tab2, text='Repulsion-radius:', font=('helvetica', 8)).place(x=7, y=313, anchor='nw')
@@ -279,9 +277,9 @@ class GUI:
         self.repel_strength_entry.insert(0, 1)
         self.repel_strength_entry.place(x=100, y=346)
 
-        self.linked_group_check = BooleanVar(self.tk, True)
+        self.linked_group_bool = BooleanVar(self.tk, True)
         self.linked_group_chk = Checkbutton(self.tab2, text='Linked to group-particles', font=('helvetica', 8),
-                                            var=self.linked_group_check)
+                                            var=self.linked_group_bool)
         self.linked_group_chk.place(x=7, y=376, anchor='nw')
 
         Label(self.tab2, text='Link-breaking-force:', font=('helvetica', 8)).place(x=7, y=400, anchor='nw')
@@ -314,18 +312,18 @@ class GUI:
                                        command=self.sim.select_group)
         self.group_select_btn.place(x=123, y=480, anchor='center')
 
-        self.separate_group_check = BooleanVar(self.tk, False)
+        self.separate_group_bool = BooleanVar(self.tk, False)
         self.separate_group_chk = Checkbutton(self.tab2, text='Separate Group', font=('helvetica', 8),
-                                              var=self.separate_group_check)
+                                              var=self.separate_group_bool)
         self.separate_group_chk.place(x=10, y=495, anchor='nw')
 
         self.copy_selected_btn = Button(self.tab2, text='Copy from selected', bg='light coral',
                                         command=self.sim.copy_from_selected)
-        self.copy_selected_btn.place(x=15, y=self.height - 65)
+        self.copy_selected_btn.place(x=15, y=self.sim.height - 65)
         self.set_selected_btn = Button(self.tab2, text='Set Selected', bg='light green', command=self.sim.set_selected)
-        self.set_selected_btn.place(x=15, y=self.height - 30)
+        self.set_selected_btn.place(x=15, y=self.sim.height - 30)
         self.set_all_btn = Button(self.tab2, text='Set All', bg='light blue', command=self.sim.set_all)
-        self.set_all_btn.place(x=95, y=self.height - 30)
+        self.set_all_btn.place(x=95, y=self.sim.height - 30)
 
     def ask_color_entry(self, *event):
         color = colorchooser.askcolor(title="Choose color")
@@ -348,6 +346,11 @@ class GUI:
             self.extra_window.update()
 
         self.tk.update()
+        
+    def destroy(self):
+        if messagebox.askokcancel("Quit", "Are you sure you want to quit?"):
+            self.running = False
+            self.gui.tk.destroy()
 
 
 class ExtraWindow:
@@ -391,19 +394,25 @@ class ExtraWindow:
                                                               activeoutline='red', tags="color_rect")
         self.gui_canvas.tag_bind("color_rect", "<Button-1>", self.change_bg_color)
 
-        self.gui_canvas.create_text(100, 160, text='Links', font=('helvetica', 9), anchor='center')
-        self.gui_canvas.create_line(70, 170, 130, 170, fill='grey50')
+        self.void_edges_bool = BooleanVar(self.tk, self.sim.void_edges)
+        self.void_edges_chk = Checkbutton(self.tk, text='Void edges', font=('helvetica', 8),
+                                          var=self.void_edges_bool)
+        self.void_edges_chk.place(x=25, y=135)
+        self.void_edges_bool.trace("w", self.void_edges_toggle)
 
-        self.stress_visualization_check = BooleanVar(self.tk, self.sim.stress_visualization)
-        self.stress_visualization_chk = Checkbutton(self.tk, text='Stress Visualization',
-                                                    font=('helvetica', 8),
-                                                    var=self.stress_visualization_check)
-        self.stress_visualization_chk.place(x=25, y=175, anchor='nw')
-        self.stress_visualization_check.trace("w", self.update_stress)
+        self.gui_canvas.create_text(75, 170, text='Links', font=('helvetica', 9), anchor='center')
+        self.gui_canvas.create_line(50, 180, 100, 180, fill='grey50')
 
         self.fit_link_btn = Button(self.tk, text='Fit-link Selected', font=('helvetica', 7, 'bold'), bg='light blue',
                                    command=lambda: self.sim.link_selection(fit_link=True))
-        self.fit_link_btn.place(x=30, y=210)
+        self.fit_link_btn.place(x=30, y=195)
+
+        self.stress_visualization_bool = BooleanVar(self.tk, self.sim.stress_visualization)
+        self.stress_visualization_chk = Checkbutton(self.tk, text='Stress Visualization',
+                                                    font=('helvetica', 8),
+                                                    var=self.stress_visualization_bool)
+        self.stress_visualization_chk.place(x=25, y=220, anchor='nw')
+        self.stress_visualization_bool.trace("w", self.update_stress)
 
         self.min_hold_change = 1
         self.min_delta_change = 0.25
@@ -449,13 +458,16 @@ class ExtraWindow:
             pass
 
     def update_stress(self, *event):
-        self.sim.stress_visualization = self.stress_visualization_check.get()
+        self.sim.stress_visualization = self.stress_visualization_bool.get()
 
     def change_bg_color(self, *event):
         color = colorchooser.askcolor(title="Choose color")
         if color[0] is not None:
             self.sim.bg_color = color
             self.gui_canvas.itemconfig(self.bg_color_rect, fill=color[1])
+
+    def void_edges_toggle(self, *event):
+        self.sim.void_edges = self.void_edges_bool.get()
 
     def change_length(self, sign):
         try:
@@ -504,7 +516,7 @@ class CodeWindow:
 
         self.code_box = Text(self.scroll_frame, undo=True)
         self.code_box.grid(row=0, column=0, sticky="nsew")
-        self.code_box.insert(INSERT, 'print("Hello World")')
+        self.code_box.insert(INSERT, self.sim.code)
         self.scrollbar = ttk.Scrollbar(self.scroll_frame, command=self.code_box.yview)
         self.scrollbar.grid(row=0, column=1, sticky='nsew')
         self.code_box['yscrollcommand'] = self.scrollbar.set
@@ -528,7 +540,7 @@ class CodeWindow:
             self.sim.execute(self.code_box.get("1.0", END))
 
     def destroy(self):
-        if messagebox.askokcancel("Quit", "Are you sure you want to quit?"):
-            self.sim.gui.code_window = None
-            self.tk.destroy()
-            del self
+        self.sim.gui.code_window = None
+        self.sim.code = self.code_box.get("1.0", END)
+        self.tk.destroy()
+        del self

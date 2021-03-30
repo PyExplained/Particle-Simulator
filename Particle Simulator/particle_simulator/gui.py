@@ -349,8 +349,8 @@ class GUI:
         
     def destroy(self):
         if messagebox.askokcancel("Quit", "Are you sure you want to quit?"):
-            self.running = False
-            self.gui.tk.destroy()
+            self.sim.running = False
+            self.tk.destroy()
 
 
 class ExtraWindow:

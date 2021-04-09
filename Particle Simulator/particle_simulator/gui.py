@@ -329,7 +329,7 @@ class GUI:
         color = colorchooser.askcolor(title="Choose color")
         if color[0] is not None:
             self.color_entry.delete(0, END)
-            self.color_entry.insert(0, str([round(x) for x in color[0]]))
+            self.color_entry.insert(0, str([math.floor(x) for x in color[0]]))
             self.tab2_canvas.itemconfig(self.part_color_rect, fill=color[1])
 
     def change_color_entry(self, *event):
@@ -534,10 +534,12 @@ class CodeWindow:
         self.threading_chk.place(x=460, y=435, anchor='ne')
 
     def execute(self):
+        code = self.code_box.get("1.0", END)
+        self.sim.code = code
         if self.use_threading.get():
-            threading.Thread(target=self.sim.execute, args=[self.code_box.get("1.0", END)]).start()
+            threading.Thread(target=self.sim.execute, args=[code]).start()
         else:
-            self.sim.execute(self.code_box.get("1.0", END))
+            self.sim.execute(code)
 
     def destroy(self):
         self.sim.gui.code_window = None

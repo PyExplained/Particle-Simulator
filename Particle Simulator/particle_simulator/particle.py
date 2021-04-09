@@ -115,8 +115,8 @@ class Particle:
         self.a = self.a + force / abs(self.m)
 
     def calc_attraction_force(self, distance, direction, repel_r, attr, repel, rest_distance,
-                              is_in_group, is_linked, linked_group_particles,
-                              link_attr_breaking_force, link_repel_breaking_force, gravity, part):
+                              is_in_group, is_linked, link_attr_breaking_force, link_repel_breaking_force,
+                              gravity, part):
         magnitude = 0
         attract = True
         if distance < repel_r:
@@ -192,13 +192,11 @@ class Particle:
 
                             for i, particle in enumerate([p, self]):
                                 if conditions[i]:
-                                    if repel_r is None:
-                                        repel_r = particle.repel_r
+                                    repel_r_ = particle.repel_r if repel_r is None else repel_r
 
-                                    rest_distance = abs(distance - repel_r)
-                                    new_inputs = [distance, direction, repel_r, particle.attr, particle.repel,
+                                    rest_distance = abs(distance - repel_r_)
+                                    new_inputs = [distance, direction, repel_r_, particle.attr, particle.repel,
                                                   rest_distance, is_in_group, is_linked,
-                                                  particle.linked_group_particles,
                                                   particle.link_attr_breaking_force, particle.link_repel_breaking_force,
                                                   particle.gravity_mode]
 
@@ -208,11 +206,11 @@ class Particle:
                                         force += self.calc_attraction_force(*new_inputs, particle)
                                         inputs = new_inputs.copy()
                         else:
-                            if repel_r is None:
-                                repel_r = max(self.repel_r, p.repel_r)
-                            force = self.calc_attraction_force(distance, direction, repel_r, (p.attr + self.attr),
-                                                               (p.repel + self.repel), abs(distance - repel_r),
-                                                               is_in_group, is_linked, p.linked_group_particles,
+                            repel_r_ = max(self.repel_r, p.repel_r) if repel_r is None else repel_r
+
+                            force = self.calc_attraction_force(distance, direction, repel_r_, (p.attr + self.attr),
+                                                               (p.repel + self.repel), abs(distance - repel_r_),
+                                                               is_in_group, is_linked,
                                                                p.link_attr_breaking_force, p.link_repel_breaking_force,
                                                                self.gravity_mode or p.gravity_mode, p)
 

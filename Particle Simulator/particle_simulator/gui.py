@@ -4,6 +4,7 @@ from particle_simulator import *
 class GUI:
     def __init__(self, sim, title, gridres):
         self.sim = sim
+        self.path = os.path.split(os.path.abspath(__file__))[0]
 
         self.tk = Tk()
         self.tk.title(title)
@@ -20,29 +21,29 @@ class GUI:
         self.toolbar = self.gui_canvas.create_rectangle(0, 0, self.sim.width, 30, fill="#1f3333")
         self.gui_canvas.create_line(80, 0, 80, 30, fill='grey30')
 
-        self.play_photo = PhotoImage(file='Assets/play.gif', master=self.tk).subsample(8, 8)
-        self.pause_photo = PhotoImage(file='Assets/pause.gif', master=self.tk).subsample(7, 7)
+        self.play_photo = PhotoImage(file=os.path.join(self.path, 'Assets/play.gif'), master=self.tk).subsample(8, 8)
+        self.pause_photo = PhotoImage(file=os.path.join(self.path, 'Assets/pause.gif'), master=self.tk).subsample(7, 7)
         self.pause_button = Button(self.gui_canvas, image=self.play_photo if self.sim.paused else self.pause_photo,
                                    cursor='hand2', border='0', bg='#1f3333', activebackground='#1f3333',
                                    command=self.sim.toggle_paused)
         self.pause_button.place(x=40, y=16, anchor='center')
 
         x = 125
-        self.select_img = PhotoImage(file='Assets/select.gif', master=self.tk).subsample(57, 57)
+        self.select_img = PhotoImage(file=os.path.join(self.path, 'Assets/select.gif'), master=self.tk).subsample(57, 57)
         self.select_btn = Button(self.tk, image=self.select_img, cursor='hand2', relief=FLAT,
                                  bg='#1f3333', activebackground='#1f3333',
                                  command=lambda: self.sim.change_mode('SELECT')).place(x=x, y=16, anchor='center')
         self.select_rect = self.gui_canvas.create_rectangle(x - 12, 3, x + 12, 27, outline='blue', state='hidden')
 
         x = 165
-        self.move_img = PhotoImage(file='Assets/move.gif', master=self.tk).subsample(42, 42)
+        self.move_img = PhotoImage(file=os.path.join(self.path, 'Assets/move.gif'), master=self.tk).subsample(42, 42)
         self.move_btn = Button(self.tk, image=self.move_img, cursor='hand2', relief=FLAT,
                                bg='#1f3333', activebackground='#1f3333',
                                command=lambda: self.sim.change_mode('MOVE')).place(x=x, y=16, anchor='center')
         self.move_rect = self.gui_canvas.create_rectangle(x - 12, 3, x + 12, 27, outline='blue')
 
         x = 205
-        self.add_img = PhotoImage(file='Assets/add.gif', master=self.tk).subsample(36, 36)
+        self.add_img = PhotoImage(file=os.path.join(self.path, 'Assets/add.gif'), master=self.tk).subsample(36, 36)
         self.add_btn = Button(self.tk, image=self.add_img, cursor='hand2', relief=FLAT,
                               bg='#1f3333', activebackground='#1f3333',
                               command=lambda: self.sim.change_mode('ADD'))
@@ -59,19 +60,19 @@ class GUI:
                                  command=lambda: self.sim.unlink_selection())
         self.unlink_btn.place(x=300, y=16, anchor='center')
 
-        self.save_img = PhotoImage(file='Assets/save.gif', master=self.tk).subsample(28, 28)
+        self.save_img = PhotoImage(file=os.path.join(self.path, 'Assets/save.gif'), master=self.tk).subsample(28, 28)
         self.save_btn = Button(self.tk, image=self.save_img, cursor='hand2',
                                bg='#1f3333', activebackground='#1f3333', relief='flat',
                                command=lambda: self.sim.save_manager.save())
         self.save_btn.place(x=self.sim.width - 110, y=16, anchor='center')
 
-        self.load_img = PhotoImage(file='Assets/load.gif', master=self.tk).subsample(32, 32)
+        self.load_img = PhotoImage(file=os.path.join(self.path, 'Assets/load.gif'), master=self.tk).subsample(32, 32)
         self.load_btn = Button(self.tk, image=self.load_img, cursor='hand2',
                                bg='#1f3333', activebackground='#1f3333', relief='flat',
                                command=lambda: self.sim.save_manager.load())
         self.load_btn.place(x=self.sim.width - 75, y=16, anchor='center')
 
-        self.code_img = PhotoImage(file='Assets/code.gif', master=self.tk).subsample(13, 13)
+        self.code_img = PhotoImage(file=os.path.join(self.path, 'Assets/code.gif'), master=self.tk).subsample(13, 13)
         self.code_btn = Button(self.tk, image=self.code_img, cursor='hand2', relief=FLAT,
                                bg='#1f3333', activebackground='#1f3333',
                                command=lambda: CodeWindow(self.sim))
@@ -188,7 +189,7 @@ class GUI:
                                                     var=self.calculate_radii_diff_bool)
         self.calculate_radii_diff_chk.place(x=7, y=553, anchor='nw')
 
-        self.extra_img = PhotoImage(file='Assets/dots.gif', master=self.tk).subsample(11, 11)
+        self.extra_img = PhotoImage(file=os.path.join(self.path, 'Assets/dots.gif'), master=self.tk).subsample(11, 11)
         self.extra_btn = Button(self.tab1, image=self.extra_img, cursor='hand2', bg='#F0F0F0',
                                 activebackground='#F0F0F0', relief='flat',
                                 command=lambda: ExtraWindow(self.sim))
@@ -306,7 +307,7 @@ class GUI:
                                     command=self.sim.add_group)
         self.group_add_btn.place(x=105, y=480, anchor='center')
 
-        self.select_img2 = PhotoImage(file='Assets/select2.gif', master=self.tk).subsample(54, 54)
+        self.select_img2 = PhotoImage(file=os.path.join(self.path, 'Assets/select2.gif'), master=self.tk).subsample(54, 54)
         self.group_select_btn = Button(self.tab2, image=self.select_img2, cursor='hand2', bg='#F0F0F0',
                                        activebackground='#F0F0F0', relief='flat',
                                        command=self.sim.select_group)
@@ -346,7 +347,7 @@ class GUI:
             self.extra_window.update()
 
         self.tk.update()
-        
+
     def destroy(self):
         if messagebox.askokcancel("Quit", "Are you sure you want to quit?"):
             self.sim.running = False
@@ -356,6 +357,7 @@ class GUI:
 class ExtraWindow:
     def __init__(self, sim):
         self.sim = sim
+        self.path = self.sim.gui.path
         self.sim.gui.extra_window = self
         self.tk = Tk()
         self.tk.title('Extra Options')
@@ -423,7 +425,7 @@ class ExtraWindow:
         self.delta_length_entry = Spinbox(self.tk, width=7, from_=0, to=100, increment=0.1)
         self.delta_length_entry.place(x=30, y=265)
 
-        self.plus_photo = PhotoImage(file='Assets/plus.gif', master=self.tk).subsample(7, 7)
+        self.plus_photo = PhotoImage(file=os.path.join(self.path, 'Assets/plus.gif'), master=self.tk).subsample(7, 7)
         self.link_longer_button = Button(self.tk, image=self.plus_photo, cursor='hand2',
                                          bg='#F0F0F0', activebackground='#F0F0F0', relief='flat',
                                          command=lambda: self.change_length(1))
@@ -431,7 +433,7 @@ class ExtraWindow:
         self.link_longer_button.bind('<ButtonRelease-1>', lambda x: self.toggle_link_change_plus(False))
         self.link_longer_button.place(x=100, y=275, anchor='center')
 
-        self.minus_photo = PhotoImage(file='Assets/minus.gif', master=self.tk).subsample(10, 10)
+        self.minus_photo = PhotoImage(file=os.path.join(self.path, 'Assets/minus.gif'), master=self.tk).subsample(10, 10)
         self.link_shorter_button = Button(self.tk, image=self.minus_photo, cursor='hand2',
                                           bg='#F0F0F0', activebackground='#F0F0F0', relief='flat',
                                           command=lambda: self.change_length(-1))

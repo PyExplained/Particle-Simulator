@@ -161,7 +161,7 @@ class Particle:
                 is_in_group = not self.separate_group and p in self.sim.groups[self.group]
                 is_linked = p in self.linked
                 if p == self or (not self.linked_group_particles and not is_linked and is_in_group) or \
-                        p in self.collisions:
+                        p in self.collisions or (self.locked and p.locked):
                     continue
 
                 # Attract / repel
@@ -228,10 +228,10 @@ class Particle:
 
                     # Visual overlap fix
                     translate_vector = -direction * (self.r + p.r) - -direction * distance
-                    if not self.mouse and not self.locked:
+                    if not self.mouse:
                         self.x += translate_vector[0] * (self.m / (self.m + p.m))
                         self.y += translate_vector[1] * (self.m / (self.m + p.m))
-                    if not p.mouse and not self.locked:
+                    if not p.mouse:
                         p.x -= translate_vector[0] * (p.m / (self.m + p.m))
                         p.y -= translate_vector[1] * (p.m / (self.m + p.m))
 

@@ -360,12 +360,16 @@ class Simulation:
         for data in self.clipboard:
             temp_particles.append(Particle(self, 0, 0, group=data['group']))
 
-        for i, d in enumerate(self.clipboard):
+        for i, data in enumerate(self.clipboard):
+            d = data.copy()
             particle = temp_particles[i]
             d['x'] += self.mx
             d['y'] += self.my
             for key, value in d.items():
-                vars(particle)[key] = value
+                try:
+                    vars(particle)[key] = value.copy()
+                except AttributeError:
+                    vars(particle)[key] = value
 
             particle.init_constants()
             particle.linked = [temp_particles[index] for index in particle.linked]

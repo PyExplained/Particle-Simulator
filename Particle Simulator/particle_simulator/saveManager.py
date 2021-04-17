@@ -4,10 +4,11 @@ from particle_simulator import *
 class SaveManager:
     def __init__(self, sim):
         self.sim = sim
+        self.file_location = os.path.dirname(self.sim.gui.path)
         self.filename = 'simulation'
 
     def save(self):
-        filename = asksaveasfilename(initialdir=".",
+        filename = asksaveasfilename(initialdir=self.file_location,
                                      initialfile=self.filename,
                                      defaultextension=".sim",
                                      filetypes=[("Simulation files", '*.sim'), ("All Files", "*.*")])
@@ -65,7 +66,7 @@ class SaveManager:
 
                 pickle.dump(data, open(filename, "wb"))
 
-                self.filename = os.path.basename(filename)
+                self.file_location, self.filename = os.path.split(filename)
             except Exception as error:
                 self.sim.error = ('Saving-Error', error)
 
@@ -73,7 +74,7 @@ class SaveManager:
         if not self.sim.paused:
             self.sim.toggle_paused()
 
-        filename = askopenfilename(initialdir=".",
+        filename = askopenfilename(initialdir=self.file_location,
                                    initialfile=self.filename,
                                    defaultextension=".sim",
                                    filetypes=[("Simulation files", '*.sim'), ("All Files", "*.*")])
@@ -113,6 +114,6 @@ class SaveManager:
                     particle.link_lengths = {self.sim.particles[index]: value for index, value in
                                              particle.link_lengths.items()}
 
-                self.filename = os.path.basename(filename)
+                self.file_location, self.filename = os.path.split(filename)
             except Exception as error:
                 self.sim.error = ('Loading-Error', error)

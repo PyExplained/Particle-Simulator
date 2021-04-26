@@ -157,83 +157,86 @@ class Particle:
             else:
                 near_particles = self.sim.particles
 
-            for p in near_particles:
-                is_in_group = not self.separate_group and p in self.sim.groups[self.group]
-                is_linked = p in self.linked
-                if p == self or (not self.linked_group_particles and not is_linked and is_in_group) or \
-                        p in self.collisions or (self.locked and p.locked):
-                    continue
+            if not self.locked:
+                for p in near_particles:
+                    is_in_group = not self.separate_group and p in self.sim.groups[self.group]
+                    is_linked = p in self.linked
+                    if p == self or (not self.linked_group_particles and not is_linked and is_in_group) or \
+                            p in self.collisions:
+                        continue
 
-                # Attract / repel
-                repel_r = None
-                if is_linked and self.link_lengths[p] != 'repel':
-                    repel_r = self.link_lengths[p]
+                    # Attract / repel
+                    repel_r = None
+                    if is_linked and self.link_lengths[p] != 'repel':
+                        repel_r = self.link_lengths[p]
 
-                direction = np.array([p.x, p.y]) - np.array([self.x, self.y])
-                distance = np.linalg.norm(direction)
-                if distance != 0:
-                    direction = direction / distance
-                conditions = [
-                    (p.attr != 0 or p.repel != 0) and (p.attr_r < 0 or p.attr_r < 0 or distance < p.attr_r),
-                    (self.attr != 0 or self.repel != 0) and
-                    (self.attr_r < 0 or self.attr_r < 0 or distance < self.attr_r)
-                    ]
-                if conditions[0] or conditions[1]:
-                    if distance == 0:
-                        if self.gravity_mode or p.gravity_mode:
-                            force = np.zeros(2)
+                    direction = np.array([p.x, p.y]) - np.array([self.x, self.y])
+                    distance = np.linalg.norm(direction)
+                    if distance != 0:
+                        direction = direction / distance
+                    conditions = [
+                        (p.attr != 0 or p.repel != 0) and (p.attr_r < 0 or p.attr_r < 0 or distance < p.attr_r),
+                        (self.attr != 0 or self.repel != 0) and
+                        (self.attr_r < 0 or self.attr_r < 0 or distance < self.attr_r)
+                        ]
+                    if conditions[0] or conditions[1]:
+                        if distance == 0:
+                            if self.gravity_mode or p.gravity_mode:
+                                force = np.zeros(2)
+                            else:
+                                force = np.random.uniform(-10, 10, 2)
+                                force = force / np.linalg.norm(force) * -self.repel
                         else:
-                            force = np.random.uniform(-10, 10, 2)
-                            force = force / np.linalg.norm(force) * -self.repel
-                    else:
-                        if self.sim.calculate_radii_diff:
-                            force = 0
-                            inputs = []
+                            if self.sim.calculate_radii_diff:
+                                force = 0
+                                inputs = []
 
-                            for i, particle in enumerate([p, self]):
-                                if conditions[i]:
-                                    repel_r_ = particle.repel_r if repel_r is None else repel_r
+                                for i, particle in enumerate([p, self]):
+                                    if conditions[i]:
+                                        repel_r_ = particle.repel_r if repel_r is None else repel_r
 
-                                    rest_distance = abs(distance - repel_r_)
-                                    new_inputs = [distance, direction, repel_r_, particle.attr, particle.repel,
-                                                  rest_distance, is_in_group, is_linked,
-                                                  particle.link_attr_breaking_force, particle.link_repel_breaking_force,
-                                                  particle.gravity_mode]
+                                        rest_distance = abs(distance - repel_r_)
+                                        new_inputs = [distance, direction, repel_r_, particle.attr, particle.repel,
+                                                      rest_distance, is_in_group, is_linked,
+                                                      particle.link_attr_breaking_force,
+                                                      particle.link_repel_breaking_force,
+                                                      particle.gravity_mode]
 
-                                    if i == 1 and new_inputs == inputs:
-                                        force *= 2
-                                    else:
-                                        force += self.calc_attraction_force(*new_inputs, particle)
-                                        inputs = new_inputs.copy()
-                        else:
-                            repel_r_ = max(self.repel_r, p.repel_r) if repel_r is None else repel_r
+                                        if i == 1 and new_inputs == inputs:
+                                            force *= 2
+                                        else:
+                                            force += self.calc_attraction_force(*new_inputs, particle)
+                                            inputs = new_inputs.copy()
+                            else:
+                                repel_r_ = max(self.repel_r, p.repel_r) if repel_r is None else repel_r
 
-                            force = self.calc_attraction_force(distance, direction, repel_r_, (p.attr + self.attr),
-                                                               (p.repel + self.repel), abs(distance - repel_r_),
-                                                               is_in_group, is_linked,
-                                                               p.link_attr_breaking_force, p.link_repel_breaking_force,
-                                                               self.gravity_mode or p.gravity_mode, p)
+                                force = self.calc_attraction_force(distance, direction, repel_r_, (p.attr + self.attr),
+                                                                   (p.repel + self.repel), abs(distance - repel_r_),
+                                                                   is_in_group, is_linked,
+                                                                   p.link_attr_breaking_force,
+                                                                   p.link_repel_breaking_force,
+                                                                   self.gravity_mode or p.gravity_mode, p)
 
-                    self.applyForce(force)
-                    p.forces.append(-force)
-                    p.collisions.append(self)
+                        self.applyForce(force)
+                        p.forces.append(-force)
+                        p.collisions.append(self)
 
-                if self.collision_bool and distance < self.r + p.r:
-                    temp = self.v[0]
-                    self.v[0] = (self.m - p.m) / (self.m + p.m) * self.v[0] + 2 * p.m / (self.m + p.m) * p.v[0]
-                    p.v[0] = 2 * self.m / (self.m + p.m) * temp + (p.m - self.m) / (self.m + p.m) * temp
-                    temp = self.v[1]
-                    self.v[1] = (self.m - p.m) / (self.m + p.m) * self.v[1] + 2 * p.m / (self.m + p.m) * p.v[1]
-                    p.v[1] = 2 * self.m / (self.m + p.m) * temp + (p.m - self.m) / (self.m + p.m) * temp
+                    if self.collision_bool and distance < self.r + p.r:
+                        temp = self.v[0]
+                        self.v[0] = (self.m - p.m) / (self.m + p.m) * self.v[0] + 2 * p.m / (self.m + p.m) * p.v[0]
+                        p.v[0] = 2 * self.m / (self.m + p.m) * temp + (p.m - self.m) / (self.m + p.m) * temp
+                        temp = self.v[1]
+                        self.v[1] = (self.m - p.m) / (self.m + p.m) * self.v[1] + 2 * p.m / (self.m + p.m) * p.v[1]
+                        p.v[1] = 2 * self.m / (self.m + p.m) * temp + (p.m - self.m) / (self.m + p.m) * temp
 
-                    # Visual overlap fix
-                    translate_vector = -direction * (self.r + p.r) - -direction * distance
-                    if not self.mouse:
-                        self.x += translate_vector[0] * (self.m / (self.m + p.m))
-                        self.y += translate_vector[1] * (self.m / (self.m + p.m))
-                    if not p.mouse:
-                        p.x -= translate_vector[0] * (p.m / (self.m + p.m))
-                        p.y -= translate_vector[1] * (p.m / (self.m + p.m))
+                        # Visual overlap fix
+                        translate_vector = -direction * (self.r + p.r) - -direction * distance
+                        if not self.mouse:
+                            self.x += translate_vector[0] * (self.m / (self.m + p.m))
+                            self.y += translate_vector[1] * (self.m / (self.m + p.m))
+                        if not p.mouse and not p.locked:
+                            p.x -= translate_vector[0] * (p.m / (self.m + p.m))
+                            p.y -= translate_vector[1] * (p.m / (self.m + p.m))
 
             if not self.mouse and not self.locked:
                 self.v += np.clip(self.a, -2, 2) * self.sim.speed

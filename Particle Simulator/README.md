@@ -2,7 +2,7 @@
 
 This particle simulator is written using Python. 
 Using the GUI, you can easily create and edit scenes and play with them in real-time.
-For more info, you can watch this video: _link will appear shortly_. <br>
+For more info, you can watch this video: _https://youtu.be/iLcBNWgSt7I_. <br>
 Most of the things I mentioned in that video you can also find in this file too, 
 as well as a detailed explanation about things I didn't have time for to explain in the video.
 If you have questions, suggestions or if you encounter a bug, be sure to let me know 
@@ -156,8 +156,8 @@ multiple particles selected, the fields of the settings that they don’t have i
                   (float, values range from 0 to 1)
 - **Velocity:** Current velocity of particle (x and y components: floats)
 - **Locked:** When set to True, the particle won't move, but will still affect other particle (bool)
-- **Check Collisions:** Handles particle-collisions, based on radius,
-                        !not recommended for many particles: using repel-radius works better (bool)
+- **Check Collisions:** Handles particle-collisions, based on radius, does not work when 'Use Grid' is set to True,
+                        !not recommended in simulations with many particles: using repel-radius works better (bool)
 - **Attraction-radius\*:** Minimum distance between particles before the attraction force gets applied (float)
 - **Attr-strength:** Attraction force coefficient (float)
 - **Gravity-Mode:** When set to True, attraction force will be calculated with gravity-equation 

@@ -338,7 +338,8 @@ class GUI:
             color = eval(self.color_var.get())
             self.tab2_canvas.itemconfig(self.part_color_rect, fill='#%02x%02x%02x' % tuple(color))
         except:
-            pass
+            if self.color_var.get() == 'random' or self.color_var.get() == '':
+                self.tab2_canvas.itemconfig(self.part_color_rect, fill='#ffffff')
 
     def update(self):
         if self.code_window is not None:

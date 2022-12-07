@@ -1,0 +1,4 @@
+pynput
+numpy
+opencv-python
+Pillow

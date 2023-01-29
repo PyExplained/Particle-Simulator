@@ -11,7 +11,7 @@ class Grid:
         self.column_width = sim.width / self.columns
 
     def init_grid(self):
-        self.grid = np.empty((self.rows, self.columns), dtype=np.object)
+        self.grid = np.empty((self.rows, self.columns), dtype="object")
         for i in range(self.rows):
             for j in range(self.columns):
                 self.grid[i, j] = []

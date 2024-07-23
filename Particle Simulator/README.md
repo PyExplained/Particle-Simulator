@@ -210,7 +210,7 @@ cols = 10
 rows = 10
 spread_x = 40
 spread_y = 40
-grid = np.empty((rows, cols), dtype=np.object)
+grid = np.empty((rows, cols), dtype=object)
 for ix, x in enumerate(range(10, 10+spread_x*cols, spread_x)):
 	for iy, y in enumerate(range(10, 10+spread_y*rows, spread_y)):
 		self.add_particle(x, y)
